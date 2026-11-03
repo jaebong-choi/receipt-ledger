@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>영수증 지출장부</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --desk:#E6EAEE; --paper:#FFFFFF; --ink:#1C2733; --muted:#5B6773; --rule:#2B3640; --line:#C9D1D8;
+  --accent:#1F5F8B; --accent-ink:#FFFFFF; --accent-soft:#DCE8F1; --warn:#9A5B00; --warn-soft:#FBEFD9; --ok:#2E6E48;
+  --panel:#F7F9FA; --focus:#1F5F8B;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --desk:#141A20; --paper:#1E262E; --ink:#E4E9EE; --muted:#9AA6B2; --rule:#8B98A5; --line:#3A4651;
+    --accent:#6FA8D6; --accent-ink:#0F1A24; --accent-soft:#22384A; --warn:#E3B062; --warn-soft:#3A2E1A; --ok:#7CC496;
+    --panel:#19212A; --focus:#8EC0E8;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --desk:#141A20; --paper:#1E262E; --ink:#E4E9EE; --muted:#9AA6B2; --rule:#8B98A5; --line:#3A4651;
+  --accent:#6FA8D6; --accent-ink:#0F1A24; --accent-soft:#22384A; --warn:#E3B062; --warn-soft:#3A2E1A; --ok:#7CC496;
+  --panel:#19212A; --focus:#8EC0E8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--desk);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:15px;line-height:1.55}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.hero{background:var(--paper);border-bottom:1px solid var(--line)}
+.hero-in{max-width:1240px;margin:0 auto;padding:36px 20px 30px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px 24px;flex-wrap:wrap}
+@media (max-width:900px){.hero-in{padding:22px 16px 20px}}
+.eyebrow{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.02em}
+h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ver{font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:3px 8px}
+.lead{color:var(--muted);margin:10px 0 0;font-size:15px;max-width:560px}
+.flow{display:flex;gap:6px;flex-wrap:wrap;margin:0;padding:0;list-style:none}
+.flow li{font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.flow li b{color:var(--ink);font-weight:600;margin-right:4px}
+.wrap{display:grid;grid-template-columns:340px minmax(0,1fr);gap:28px;max-width:1240px;margin:0 auto;padding:28px 20px 60px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;padding:16px 16px 40px}}
+aside{position:sticky;top:16px;align-self:start;display:flex;flex-direction:column;gap:14px}
+@media (max-width:900px){aside{position:static}}
+main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px}
+.step h2{font-size:15px;font-weight:600;margin:0 0 10px;display:flex;gap:10px;align-items:baseline}
+.step h2 b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:12px;flex:none}
+.drop{border:1.5px dashed var(--rule);border-radius:4px;padding:18px 12px;text-align:center;cursor:pointer;color:var(--muted);font-size:14px;background:var(--panel)}
+.drop.over{background:var(--accent-soft);border-color:var(--accent)}
+.drop strong{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:4px;padding:7px 12px;cursor:pointer;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.wide{width:100%}
+.row{display:flex;gap:6px;margin-top:8px}.row .btn{flex:1}
+input[type=password]{width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 10px;background:var(--panel)}
+label.chk{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);margin-top:8px}
+.note{font-size:13px;color:var(--muted);margin:8px 0 0}
+.status{font-size:13px;margin-top:8px;min-height:1.2em}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);background:var(--panel);white-space:nowrap}
+td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td img{width:44px;height:44px;object-fit:cover;border-radius:3px;display:block}
+tr.bad td{background:var(--warn-soft)}
+.tag{font-size:12px;font-weight:600;white-space:nowrap}
+.tag.ok{color:var(--ok)}.tag.bad{color:var(--warn)}
+.empty{color:var(--muted);font-size:14px;margin:0}
+ul.probs{margin:0;padding-left:18px;font-size:14px}
+ul.probs li{color:var(--warn)}
+ul.probs b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-in">
+    <div>
+      <p class="eyebrow">영수증 사진 → 지출장부.csv</p>
+      <h1>영수증 지출장부 <span class="ver">MK1.0</span></h1>
+      <p class="lead">영수증 사진을 넣으면 한 장에 한 줄씩 장부로 정리하고, 품목 금액의 합이 합계와 맞는지 확인해 줍니다. 사진에 없는 내용은 비워 둡니다.</p>
+    </div>
+    <ol class="flow" aria-label="사용 순서">
+      <li><b>1</b>API 키 넣기</li>
+      <li><b>2</b>사진 넣기</li>
+      <li><b>3</b>CSV로 저장</li>
+    </ol>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside>
+    <section class="step">
+      <h2><b>1</b>Claude API 키</h2>
+      <input type="password" id="key" placeholder="sk-ant-..." autocomplete="off" aria-label="Claude API 키">
+      <label class="chk"><input type="checkbox" id="remember"> 이 브라우저에 기억하기</label>
+      <p class="note">키는 이 브라우저에서 Anthropic(api.anthropic.com)으로만 바로 전송됩니다. 다른 서버로는 가지 않아요. 사진 한 장 읽을 때마다 API 사용료가 듭니다.</p>
+    </section>
+
+    <section class="step">
+      <h2><b>2</b>영수증 사진 넣기</h2>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="영수증 사진 선택">
+        <strong>사진을 여기에 끌어 놓기</strong>
+        또는 눌러서 선택 (여러 장 가능)
+      </div>
+      <input type="file" id="file" accept="image/*" multiple hidden>
+      <div class="status" id="status"></div>
+      <div class="row"><button class="btn" id="clearBtn" disabled>모두 지우기</button></div>
+    </section>
+
+    <section class="step">
+      <h2><b>3</b>저장</h2>
+      <button class="btn primary wide" id="csvBtn" disabled>지출장부.csv 저장</button>
+      <p class="note">엑셀에서 바로 열 수 있게 저장됩니다.</p>
+    </section>
+  </aside>
+
+  <main>
+    <section class="step">
+      <h2>지출장부</h2>
+      <div class="tblwrap">
+        <table>
+          <thead><tr><th></th><th>날짜</th><th>가게</th><th>품목</th><th>합계</th><th>결제수단</th><th>분류</th><th>검증</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="empty">아직 넣은 사진이 없어요.</p>
+    </section>
+
+    <section class="step">
+      <h2>확인이 필요한 영수증</h2>
+      <ul class="probs" id="probs"></ul>
+      <p class="empty" id="probsEmpty">없음</p>
+    </section>
+
+    <section class="step">
+      <h2>분류별 합계</h2>
+      <table><tbody id="cats"></tbody></table>
+    </section>
+  </main>
+</div>
+
+<script>
+// 장부만들기.py 와 같은 프롬프트·스키마·검증 규칙
+const CATS = ["식비", "교통", "사무용품", "배송", "생활용품"];
+const PROMPT = `영수증 사진 한 장을 JSON으로 옮겨라.
+사진에 실제로 보이는 내용만 옮긴다. 안 보이거나 확실하지 않은 칸은 null로 둔다. 추측해서 채우지 않는다.
+- date: YYYY-MM-DD
+- store: 가게 이름
+- items: 품목마다 이름과 그 줄의 최종 금액(원, 정수). 할인은 음수 줄로 넣는다. 금액이 안 보이면 amount는 null.
+- total: 영수증에 적힌 최종 결제 합계(원, 정수)
+- payment: 영수증에 적힌 결제수단 그대로(예: 신용카드 국민, 현금, 계좌이체)
+- category: 품목을 보고 식비/교통/사무용품/배송/생활용품 중 하나. 영수증이 아니면 null.
+- readable: 영수증이 아니거나 글자를 거의 못 읽으면 false`;
+const NS = {type: ["string", "null"]}, NI = {type: ["integer", "null"]};
+const SCHEMA = {
+  type: "object",
+  properties: {
+    readable: {type: "boolean"}, date: NS, store: NS, total: NI, payment: NS,
+    items: {type: "array", items: {type: "object", properties: {name: {type: "string"}, amount: NI},
+      required: ["name", "amount"], additionalProperties: false}},
+    category: {anyOf: [{type: "string", enum: CATS}, {type: "null"}]},
+  },
+  required: ["readable", "date", "store", "items", "total", "payment", "category"],
+  additionalProperties: false,
+};
+
+function check(r) {
+  if (!r.readable) return ["안 읽힘"];
+  const probs = [["date", "날짜"], ["store", "가게"], ["payment", "결제수단"], ["category", "분류"]]
+    .filter(([k]) => !r[k]).map(([, n]) => n + " 없음");
+  const a = (r.items || []).map(i => i.amount);
+  const sum = a.reduce((s, x) => s + x, 0);
+  if (!a.length) probs.push("품목 없음");
+  else if (a.includes(null)) probs.push("금액 안 읽힌 품목 있음");
+  else if (r.total == null) probs.push("합계 없음");
+  else if (sum !== r.total) probs.push(`합계 불일치: 품목 합 ${won(sum)} ≠ 합계 ${won(r.total)}`);
+  return probs;
+}
+
+const $ = id => document.getElementById(id);
+const won = n => n.toLocaleString("ko-KR");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+let list = [];  // {name, thumb, r, probs, pending}
+
+try { const k = localStorage.getItem("claudeKey"); if (k) { $("key").value = k; $("remember").checked = true; } } catch {}
+$("remember").onchange = $("key").onchange = () => {
+  try { $("remember").checked ? localStorage.setItem("claudeKey", $("key").value) : localStorage.removeItem("claudeKey"); } catch {}
+};
+
+// 폰 사진은 5MB를 넘기 쉬워서 긴 변 1800px JPEG로 줄여 보낸다
+async function shrink(file) {
+  const img = await createImageBitmap(file);
+  const s = Math.min(1, 1800 / Math.max(img.width, img.height));
+  const c = Object.assign(document.createElement("canvas"), {width: Math.round(img.width * s), height: Math.round(img.height * s)});
+  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", 0.9);
+}
+
+async function readReceipt(dataUrl) {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": $("key").value.trim(),
+      "anthropic-version": "2023-06-01",
+      "anthropic-beta": "server-side-fallback-2026-07-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    },
+    body: JSON.stringify({
+      model: "claude-opus-5-5", max_tokens: 4000, fallbacks: "default",
+      output_config: {format: {type: "json_schema", schema: SCHEMA}},
+      messages: [{role: "user", content: [
+        {type: "image", source: {type: "base64", media_type: "image/jpeg", data: dataUrl.split(",")[1]}},
+        {type: "text", text: PROMPT},
+      ]}],
+    }),
+  });
+  const j = await res.json();
+  if (!res.ok) throw new Error(j.error?.message || res.status);
+  if (j.stop_reason !== "end_turn") throw new Error("응답이 중간에 멈춤(" + j.stop_reason + ")");
+  return JSON.parse(j.content.find(b => b.type === "text").text);
+}
+
+async function addFiles(files) {
+  if (!$("key").value.trim()) { $("status").textContent = "먼저 API 키를 넣어 주세요."; $("key").focus(); return; }
+  const jobs = [...files].sort((a, b) => a.name.localeCompare(b.name, "ko", {numeric: true}))
+    .map(f => { const e = {name: f.name, file: f, pending: true}; list.push(e); return e; });
+  render();
+  const queue = [...jobs];
+  // ponytail: 동시 3장. 키 한도(429)에 걸리면 숫자를 줄이면 됨
+  await Promise.all([0, 1, 2].map(async () => {
+    for (let e; (e = queue.shift());) {
+      try {
+        const url = await shrink(e.file);
+        e.thumb = url;
+        e.r = await readReceipt(url);
+        e.probs = check(e.r);
+      } catch (err) {
+        e.r = {readable: false};
+        e.probs = ["안 읽힘: " + (err.message || err)];
+      }
+      e.pending = false;
+      render();
+    }
+  }));
+}
+
+function render() {
+  const done = list.filter(e => !e.pending), wait = list.length - done.length;
+  $("status").textContent = list.length ? (wait ? `읽는 중… ${done.length}/${list.length}` : `${list.length}장 완료`) : "";
+  $("empty").hidden = list.length > 0;
+  $("clearBtn").disabled = !list.length || wait > 0;
+  $("csvBtn").disabled = !done.some(e => e.r.readable) || wait > 0;
+
+  $("rows").innerHTML = list.map(e => {
+    if (e.pending) return `<tr><td></td><td colspan="7">${esc(e.name)} 읽는 중…</td></tr>`;
+    const r = e.r, bad = e.probs.length > 0;
+    const items = r.readable ? r.items.map(i => esc(i.name) + " " + (i.amount == null ? "?" : won(i.amount))).join("<br>") : "";
+    return `<tr class="${bad ? "bad" : ""}">
+      <td>${e.thumb ? `<img src="${e.thumb}" alt="${esc(e.name)}">` : ""}</td>
+      <td>${esc(r.date)}</td><td>${esc(r.store)}</td><td>${items}</td>
+      <td class="n">${r.total == null ? "" : won(r.total)}</td><td>${esc(r.payment)}</td><td>${esc(r.category)}</td>
+      <td><span class="tag ${bad ? "bad" : "ok"}">${bad ? "확인 필요" : "OK"}</span></td></tr>`;
+  }).join("");
+
+  const probs = done.filter(e => e.probs.length);
+  $("probs").innerHTML = probs.map(e => `<li><b>${esc(e.name)}</b> — ${esc(e.probs.join(" / "))}</li>`).join("");
+  $("probsEmpty").hidden = probs.length > 0;
+
+  const by = Object.fromEntries(CATS.map(c => [c, 0]));
+  done.forEach(e => { if (e.r.readable && e.r.category && e.r.total != null) by[e.r.category] += e.r.total; });
+  const total = Object.values(by).reduce((a, b) => a + b, 0);
+  $("cats").innerHTML = CATS.map(c => `<tr><td>${c}</td><td class="n">${won(by[c])}원</td></tr>`).join("")
+    + `<tr><th>총합</th><th class="n" style="text-align:right">${won(total)}원</th></tr>`;
+}
+
+function saveCsv() {
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const lines = [["파일", "날짜", "가게", "품목", "합계", "결제수단", "분류", "검증"]];
+  list.filter(e => !e.pending && e.r.readable).forEach(({name, r, probs}) => lines.push([
+    name, r.date, r.store,
+    r.items.map(i => i.name + " " + (i.amount == null ? "?" : won(i.amount))).join("; "),
+    r.total, r.payment, r.category, probs.join(" / ") || "OK"]));
+  const blob = new Blob(["﻿" + lines.map(l => l.map(q).join(",")).join("\r\n")], {type: "text/csv"});
+  Object.assign(document.createElement("a"), {href: URL.createObjectURL(blob), download: "지출장부.csv"}).click();
+}
+
+const drop = $("drop");
+drop.onclick = () => $("file").click();
+drop.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("file").click(); } };
+drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); addFiles([...e.dataTransfer.files].filter(f => f.type.startsWith("image/"))); };
+$("file").onchange = e => { addFiles(e.target.files); e.target.value = ""; };
+$("clearBtn").onclick = () => { list = []; render(); };
+$("csvBtn").onclick = saveCsv;
+render();
+</script>
+</body>
+</html>
